@@ -23,6 +23,7 @@ class LangchainManager:
         self.model_name = model_name
         self.llm = None
         self.llm_tools = None
+        self.graph = None
 
     @classmethod
     async def create(cls, model_name: str):
@@ -42,6 +43,15 @@ class LangchainManager:
         )
         self.tools = await self.client.get_tools()
         self.tools_by_name: dict[str, BaseTool] = {t.name: t for t in self.tools}
+        self.graph = (
+            StateGraph(MessagesState)
+            .add_node("model", self.call_model)
+            .add_node("tools", self.tool_node)
+            .set_entry_point("model")
+            .add_conditional_edges("model", self.should_call_tools, {"tools": "tools", END: END})
+            .add_edge("tools", "model")
+            .compile()
+        )
     
     def get_model_tools(self):
         if self.llm_tools is None:
@@ -83,17 +93,7 @@ class LangchainManager:
         return END
 
     async def run(self, initial_messages: list[dict]):
-        graph = (
-            StateGraph(MessagesState)
-            .add_node("model", self.call_model)
-            .add_node("tools", self.tool_node)
-            .set_entry_point("model")
-            .add_conditional_edges("model", self.should_call_tools, {"tools": "tools", END: END})
-            .add_edge("tools", "model")
-            .compile()
-        )
-
-        response = await graph.ainvoke(
+        response = await self.graph.ainvoke(
             {"messages": initial_messages}
         )
 
