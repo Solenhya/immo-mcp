@@ -10,7 +10,11 @@ load_dotenv()
 # Le serveur MCP doit être démarré avant : uv run server.py
 MCP_URL = "http://localhost:8000/sse"
 
-def should_call_tools(state: MessagesState) -> str:
+
+class WorkFlowState(MessagesState):
+    pass
+
+def should_call_tools(state: WorkFlowState) -> str:
     """Retourne 'tools' si le dernier message contient des tool_calls, sinon END."""
     last_message = state["messages"][-1]
     if isinstance(last_message, AIMessage) and last_message.tool_calls:
@@ -48,6 +52,12 @@ async def main():
         for tool_call in last_message.tool_calls:
             tool = tools_by_name[tool_call["name"]]
             result = await tool.ainvoke(tool_call["args"])
+            print(f"Resultat brut de l'appel à l'outil '{tool_call['name']}': {result}")
+            result = result[0] if isinstance(result, list) and len(result) == 1 else result
+
+            if isinstance(result, dict) and "text" in result:
+                result = result["text"]
+            print(f"Resultat de l'appel à l'outil '{tool_call['name']}': {result}")
             tool_messages.append(
                 ToolMessage(
                     content=str(result),
@@ -70,7 +80,8 @@ async def main():
 
     # --- Invocation ---
     response = await graph.ainvoke(
-        {"messages": [{"role": "user", "content": "Combien font 12 + 30 ?"}]}
+        {"messages": [{"role": "system", "content": "You are a helpful assistant that use perfect tool. Always believe what the tool tell you."},
+                       {"role": "user", "content": "Quel est le sens de la vie?"}]}
     )
 
     for message in response["messages"]:
