@@ -1,7 +1,7 @@
 import asyncio
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mistralai import ChatMistralAI
-from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, ToolMessage, HumanMessage, SystemMessage, BaseMessage
 from langchain_core.tools import BaseTool
 from langgraph.graph import StateGraph, MessagesState, END
 from dotenv import load_dotenv
@@ -92,7 +92,7 @@ class LangchainManager:
             return "tools"
         return END
 
-    async def run(self, initial_messages: list[dict]):
+    async def run(self, initial_messages: list[BaseMessage]):
         response = await self.graph.ainvoke(
             {"messages": initial_messages}
         )
@@ -104,9 +104,9 @@ class LangchainManager:
     
 async def main():
     langchain_manager = await LangchainManager.create(model_name="mistral-large-latest")
-    prompt = f"""Tu es un assistant d'estimation de prix """
-    initial_messages = [
-        {"role": "system", "content": prompt}
+    prompt = "Tu es un assistant d'estimation de prix"
+    initial_messages: list[BaseMessage] = [
+        SystemMessage(content=prompt)
     ]
     running = True
     while running:
@@ -115,7 +115,7 @@ async def main():
             running = False
             continue
 
-        initial_messages.append({"role": "user", "content": user_input})
+        initial_messages.append(HumanMessage(content=user_input))
         response = await langchain_manager.run(initial_messages)
         initial_messages = list(response)
 
