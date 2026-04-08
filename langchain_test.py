@@ -11,6 +11,7 @@ load_dotenv()
 MCP_URL = "http://localhost:8000/sse"
 
 
+
 class WorkFlowState(MessagesState):
     pass
 
@@ -86,6 +87,7 @@ async def main():
 
     for message in response["messages"]:
         print(f"[{message.type}] {message.content}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
