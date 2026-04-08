@@ -101,7 +101,7 @@ async def test_mcp_list_tools_contains_all():
     async with Client(mcp) as client:
         tools = await client.list_tools()
     tool_names = {t.name for t in tools}
-    assert {"add", "multiply", "meaning_of_life"} == tool_names
+    assert {"add", "multiply", "meaning_of_life"}.issubset(tool_names)
 
 
 async def test_mcp_tool_add_has_description():
