@@ -61,11 +61,6 @@ def test_meaning_of_life_not_empty():
 # Tests d'intégration (via client FastMCP)
 # ─────────────────────────────────────────────
 
-@pytest.fixture
-def anyio_backend():
-    return "asyncio"
-
-
 async def test_mcp_tool_add():
     async with Client(mcp) as client:
         result = await client.call_tool("add", {"a": 10, "b": 5})
