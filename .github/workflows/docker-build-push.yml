@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - main
+      - kubernetes
     tags:
       - "v*.*.*"
   pull_request:
     branches:
       - main
+      - kubernetes
 
 env:
   REGISTRY: ghcr.io
