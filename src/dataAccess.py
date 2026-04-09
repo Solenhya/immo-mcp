@@ -18,7 +18,7 @@ if parent_folder not in sys.path:
 def get_data():
     file_path = DATA_DIR / "2025.csv"
     nrows = 10000
-    df = pd.read_csv(file_path, nrows=nrows, sep="\t")
+    df = pd.read_csv(file_path, nrows=nrows, sep=",")
     logger.info(f"📊 Données chargées: {len(df):,} lignes")
     return df
 

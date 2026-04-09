@@ -7,7 +7,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import r2_score
 from sklearn.compose import ColumnTransformer
 import joblib
-import pathlib  
+import pathlib
+import pandas as pd
 
 def train_model(model_name):
     df = dataAccess.prepare_features(dataAccess.get_data())
@@ -60,6 +61,18 @@ def train_model(model_name):
     print('model saved')
 
     return model
+
+
+
+class PredictionModel:
+    def __init__(self, model_path):
+        self.model = joblib.load(model_path)
+    
+    def predict(self, features: dict) -> float:
+        input_df = pd.DataFrame([features], columns=dataAccess.features)
+        prediction = self.model.predict(input_df)[0]
+        return prediction
+
 
 if __name__ == "__main__":
     train_model("model")
