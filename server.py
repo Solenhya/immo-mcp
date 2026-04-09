@@ -18,4 +18,4 @@ def meaning_of_life() -> str:
     return "Manger des frites"
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="sse", host="0.0.0.0")
