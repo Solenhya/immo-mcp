@@ -17,6 +17,7 @@ dependencies = [
     "joblib",
     "scikit-learn",
     "python-dotenv",
+    "pandas>=3.0.2",
 ]
 
 [dependency-groups]
