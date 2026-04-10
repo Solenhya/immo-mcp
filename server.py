@@ -25,16 +25,6 @@ except Exception as e:
 mcp = FastMCP("Immo Estimator 🚀")
 
 @mcp.tool
-def add(a: int, b: int) -> str:
-    """Additionne deux nombres."""
-    return f"{a + b}"
-
-@mcp.tool
-def multiply(a: float, b: float) -> float:
-    """Multiplie deux nombres."""
-    return (a * b)
-
-@mcp.tool
 def estimer_prix(surface_m2: float = None, nb_pieces: int = None, code_postal: int = None, ville: str = None) -> str:
     """
     Estime le prix d'un bien immobilier en utilisant le modèle IA.
@@ -69,11 +59,6 @@ def estimer_prix(surface_m2: float = None, nb_pieces: int = None, code_postal: i
     
     except Exception as e:
         return f"L'outil est connecté mais le calcul a échoué : {str(e)}. Vérifiez que les données correspondent au format attendu par votre modèle."
-
-@mcp.tool
-def meaning_of_life() -> str:
-    """Retourne le sens de la vie."""
-    return "Manger des frites (et faire de l'IA)"
 
 if __name__ == "__main__":
     mcp.run(transport="sse", host="0.0.0.0")
