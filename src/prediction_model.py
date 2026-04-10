@@ -1,5 +1,5 @@
 
-from src import dataAccess
+from src import dataAccess,hugging_model_play
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -66,6 +66,10 @@ def train_model(model_name):
 
 class PredictionModel:
     def __init__(self, model_path):
+        if not pathlib.Path(model_path).exists():
+            hugging_model_play.download_model()
+        if not pathlib.Path(model_path).exists():
+            raise FileNotFoundError(f"Model file not found at {model_path}")
         self.model = joblib.load(model_path)
     
     def predict(self, features: dict) -> float:
