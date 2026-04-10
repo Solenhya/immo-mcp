@@ -43,7 +43,3 @@ async def test_predict_price_live():
 if __name__ == "__main__":
     asyncio.run(test_connection())
     asyncio.run(test_predict_price_live())
-
-import httpx
-r = httpx.get('http://localhost:8080/sse', timeout=3)
-print('Status:', r.status_code)
