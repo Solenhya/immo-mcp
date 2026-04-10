@@ -1,26 +1,34 @@
 from fastmcp import FastMCP
 from src.prediction_model import PredictionModel
 import pathlib
+import threading
 MODEL_DIR = pathlib.Path(__file__).resolve().parent.parent / "models"
 mcp = FastMCP("Demo 🚀")
 
 
+_model = None
+_model_lock = threading.Lock()
 
-model = None
+
+def _get_model() -> PredictionModel:
+    global _model
+    if _model is None:
+        with _model_lock:
+            if _model is None:
+                _model = PredictionModel(MODEL_DIR / "model.joblib")
+    return _model
+
 
 @mcp.tool
 def predict_price(surface_reelle_bati: float, surface_terrain: float, nombre_pieces_principales: int, type_local: str) -> float:
     """Predict the price of a property based on its features."""
-    global model
-    if model is None:
-        model = PredictionModel(MODEL_DIR / "model.joblib")
     features = {
         "Surface_reelle_bati": surface_reelle_bati,
         "Surface_terrain": surface_terrain,
         "Nombre_pieces_principales": nombre_pieces_principales,
         "Type_local": type_local
     }
-    predicted_price = model.predict(features)
+    predicted_price = _get_model().predict(features)
     return predicted_price
 
 if __name__ == "__main__":

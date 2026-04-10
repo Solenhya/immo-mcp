@@ -2,7 +2,6 @@
 Tests d'intégration pour src/server.py — serveur FastMCP
 """
 import pytest
-import numpy as np
 from unittest.mock import patch, MagicMock
 from fastmcp import Client
 import src.server as server_module
@@ -19,9 +18,9 @@ def mock_prediction_model():
     mock_instance.predict.return_value = 320000.0
 
     with patch("src.server.PredictionModel", return_value=mock_instance):
-        server_module.model = None  # réinitialise le singleton
+        server_module._model = None  # réinitialise le singleton
         yield mock_instance
-    server_module.model = None
+    server_module._model = None
 
 
 # ─────────────────────────────────────────────
