@@ -1,3 +1,4 @@
+import pathlib
 import pandas as pd
 import logging
 
@@ -23,6 +24,7 @@ def process_data(source_file_name, output_name):
     
     logger.info(f"Données nettoyées: {len(file)} lignes")
     
+    pathlib.Path("data").mkdir(parents=True, exist_ok=True)
     outputpath ="data/"+ output_name
     file.to_csv(outputpath, index=False)
     logger.info(f"Fichier Enregistrer dans {outputpath}")
