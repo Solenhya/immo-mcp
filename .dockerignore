@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.env
+*.md
+access_serv.py
+langchain_manager.py
+langchain_test.py
+main.py
