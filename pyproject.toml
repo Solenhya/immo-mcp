@@ -13,6 +13,10 @@ dependencies = [
     "langchain-mcp-adapters>=0.2.2",
     "langchain-mistralai>=1.1.2",
     "langgraph>=1.1.6",
+    "huggingface_hub",
+    "joblib",
+    "scikit-learn",
+    "python-dotenv",
 ]
 
 [dependency-groups]
