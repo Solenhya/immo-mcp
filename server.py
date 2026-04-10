@@ -12,14 +12,18 @@ HF_USER = os.getenv("HF_USERNAME", "Gahnos")
 HF_REPO = os.getenv("HF_REPO", "mon-modele-joblib")
 
 # 1. Téléchargement et chargement du modèle au démarrage
+model = None
+load_error = "Aucune tentative de chargement effectuée."
+
 print(f"🚀 Initialisation du serveur... Récupération du modèle {HF_USER}/{HF_REPO}")
 try:
     model_path = hf_hub_download(repo_id=f"{HF_USER}/{HF_REPO}", filename="model.joblib")
     model = joblib.load(model_path)
     print("✅ Modèle chargé avec succès !")
+    load_error = None
 except Exception as e:
+    load_error = str(e)
     print(f"❌ Erreur lors du chargement du modèle : {e}")
-    model = None
 
 # 2. Création du serveur MCP
 mcp = FastMCP("Immo Estimator 🚀")
@@ -35,7 +39,7 @@ def estimer_prix(surface_m2: float = None, nb_pieces: int = None, code_postal: i
         ville: Le nom de la ville (optionnel).
     """
     if model is None:
-        return "Désolé, le modèle d'estimation n'est pas disponible pour le moment."
+        return f"Désolé, le modèle n'est pas disponible. Erreur interne : {load_error}"
     
     # Si des infos cruciales manquent pour le calcul mathématique
     if surface_m2 is None or code_postal is None:
