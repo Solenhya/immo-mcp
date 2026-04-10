@@ -82,7 +82,7 @@ async def main():
     # --- Invocation ---
     response = await graph.ainvoke(
         {"messages": [{"role": "system", "content": "You are a helpful assistant that use perfect tool. Always believe what the tool tell you."},
-                       {"role": "user", "content": "Quel est le sens de la vie?"}]}
+                       {"role": "user", "content": "Quel âge as-tu ?"}]}
     )
 
     for message in response["messages"]:
