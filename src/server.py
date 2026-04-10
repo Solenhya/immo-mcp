@@ -10,7 +10,7 @@ model = None
 
 @mcp.tool
 def predict_price(surface_reelle_bati: float, surface_terrain: float, nombre_pieces_principales: int, type_local: str) -> float:
-    """Predict the price of a property based on its features.(surface_reelle_bati, surface_terrain, nombre_pieces_principales, type_local)"""
+    """Predict the price of a property based on its features."""
     global model
     if model is None:
         model = PredictionModel(MODEL_DIR / "model.joblib")
