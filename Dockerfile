@@ -12,10 +12,10 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project
 
 # Copy source code
-COPY server.py ./
+COPY src/ ./src/
 
 # Expose SSE port
 EXPOSE 8000
 
 # Run the MCP server
-CMD ["uv", "run", "python", "server.py"]
+CMD ["uv", "run", "python", "-m", "src.server"]

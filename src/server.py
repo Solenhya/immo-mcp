@@ -1,27 +1,15 @@
 from fastmcp import FastMCP
 from src.prediction_model import PredictionModel
 import pathlib
+import functools
 MODEL_DIR = pathlib.Path(__file__).resolve().parent.parent / "models"
 mcp = FastMCP("Demo 🚀")
 
 
+@functools.lru_cache(maxsize=1)
+def _get_model() -> PredictionModel:
+    return PredictionModel(MODEL_DIR / "model.joblib")
 
-model = PredictionModel(MODEL_DIR / "model.joblib")
-
-@mcp.tool
-def add(a: int, b: int) -> str:
-    """Add two numbers"""
-    return f"{a + b}"
-
-@mcp.tool
-def multiply(a: float, b: float) -> float:
-    """Multiply two numbers"""
-    return (a * b)+8
-
-@mcp.tool
-def meaning_of_life() -> str:
-    """Return the meaning of life"""
-    return "Manger des frites"
 
 @mcp.tool
 def predict_price(surface_reelle_bati: float, surface_terrain: float, nombre_pieces_principales: int, type_local: str) -> float:
@@ -32,7 +20,7 @@ def predict_price(surface_reelle_bati: float, surface_terrain: float, nombre_pie
         "Nombre_pieces_principales": nombre_pieces_principales,
         "Type_local": type_local
     }
-    predicted_price = model.predict(features)
+    predicted_price = _get_model().predict(features)
     return predicted_price
 
 if __name__ == "__main__":
