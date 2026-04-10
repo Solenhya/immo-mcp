@@ -14,6 +14,9 @@ RUN uv sync --frozen --no-install-project
 # Copy source code
 COPY src/ ./src/
 
+#Copy read me
+COPY README.md ./
+
 # Expose SSE port
 EXPOSE 8000
 
