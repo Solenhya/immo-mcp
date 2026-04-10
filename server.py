@@ -35,26 +35,40 @@ def multiply(a: float, b: float) -> float:
     return (a * b)
 
 @mcp.tool
-def estimer_prix(surface_m2: float, nb_pieces: int, code_postal: int) -> str:
+def estimer_prix(surface_m2: float = None, nb_pieces: int = None, code_postal: int = None, ville: str = None) -> str:
     """
     Estime le prix d'un bien immobilier en utilisant le modèle IA.
     Args:
-        surface_m2: La surface habitable en m2.
-        nb_pieces: Le nombre de pièces principales.
+        surface_m2: La surface habitable en m2 (optionnel mais recommandé).
+        nb_pieces: Le nombre de pièces principales (optionnel).
         code_postal: Le code postal (ex: 75001).
+        ville: Le nom de la ville (optionnel).
     """
     if model is None:
         return "Désolé, le modèle d'estimation n'est pas disponible pour le moment."
     
+    # Si des infos cruciales manquent pour le calcul mathématique
+    if surface_m2 is None or code_postal is None:
+        return f"Pour vous donner une estimation précise à {ville or 'votre ville'}, j'ai besoin de connaître la surface en m2 et le code postal."
+
+    # Valeur par défaut pour le nombre de pièces si l'utilisateur ne le sait pas
+    nb_pieces_calc = nb_pieces if nb_pieces is not None else 3
+    
     try:
-        # NOTE : Adapte cette partie selon les colonnes attendues par ton modèle Scikit-Learn
-        # Exemple : prediction = model.predict([[surface_m2, nb_pieces, code_postal]])
+        # Préparation des données pour le modèle (Scikit-Learn attend une liste de listes)
+        # ATTENTION : L'ordre doit être identique à celui de l'entraînement.
+        # Ici j'utilise : [surface, nb_pieces, code_postal]
+        input_data = [[float(surface_m2), int(nb_pieces_calc), int(code_postal)]]
         
-        # Pour l'instant on simule si on n'est pas sûr des colonnes
-        # Mais le modèle est bien chargé en mémoire (variable 'model')
-        return f"Modèle connecté ! Estimation en cours pour {surface_m2}m² avec {nb_pieces} pièces dans le {code_postal}."
+        prediction = model.predict(input_data)
+        prix_estime = prediction[0]
+        
+        return (f"Analyse terminée pour {ville or code_postal} ! "
+                f"Pour un bien de {surface_m2}m² avec {nb_pieces_calc} pièces, "
+                f"l'estimation est de {prix_estime:,.0f} €.")
+    
     except Exception as e:
-        return f"Erreur lors de la prédiction : {str(e)}"
+        return f"L'outil est connecté mais le calcul a échoué : {str(e)}. Vérifiez que les données correspondent au format attendu par votre modèle."
 
 @mcp.tool
 def meaning_of_life() -> str:
