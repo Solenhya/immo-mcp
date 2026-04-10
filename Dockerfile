@@ -12,7 +12,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project
 
 # Copy source code
-COPY server.py ./
+COPY src/server.py ./
 
 # Expose SSE port
 EXPOSE 8000
