@@ -104,7 +104,7 @@ class LangchainManager:
     
 async def main():
     langchain_manager = await LangchainManager.create(model_name="mistral-large-latest")
-    prompt = f"""Tu es un expert immobilier. Utilise systématiquement l'outil estimer_prix pour donner des chiffres précis plutôt que de faire des suppositions."""
+    prompt = """Tu es un expert immobilier. Utilise systématiquement l'outil 'predict_price' pour donner des estimations précises basées sur la surface du bâtiment, la surface du terrain, le nombre de pièces et le type de local."""
     initial_messages = [
         SystemMessage(prompt)
     ]

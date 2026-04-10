@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from huggingface_hub import HfApi, hf_hub_download
 import pathlib
-MODEL_DIR = pathlib.Path().parent / "models"
+MODEL_DIR = pathlib.Path(__file__).resolve().parent.parent / "models"
 
 load_dotenv()
 

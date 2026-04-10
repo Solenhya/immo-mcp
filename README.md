@@ -1,106 +1,79 @@
-# Immo-MCP : Agent IA Immobilier Professionnel
+# 🏠 Immo-MCP : Agent IA Immobilier Professionnel
 
-Ce projet implémente un agent d'intelligence artificielle spécialisé dans l'immobilier, utilisant l'architecture **MCP (Model Context Protocol)** pour séparer l'intelligence (l'Agent) des outils métiers (le Serveur).
-
-## 🏗️ Architecture du Projet
-
-Le projet est divisé en deux composants principaux :
-
-1.  **Le Serveur MCP (`server.py`)** : Développé avec `FastMCP`. C'est la "boîte à outils" qui contient les fonctions métiers (calculs, accès base de données DVF). Il tourne dans un conteneur Docker.
-2.  **L'Agent IA (`langchain_manager.py`)** : Développé avec `LangChain` et `LangGraph`. C'est le cerveau qui utilise Mistral AI pour comprendre les demandes de l'utilisateur et appeler les outils du serveur.
+Ce projet implémente un système d'intelligence artificielle spécialisé dans l'immobilier. Il utilise l'architecture **MCP (Model Context Protocol)** pour connecter un agent intelligent à un moteur de prédiction de prix basé sur du **Machine Learning réel**.
 
 ---
 
-## 💻 Développement Local
+## 🏗️ Architecture du Projet
 
-### Prérequis
-*   [uv](https://github.com/astral-sh/uv) (gestionnaire de paquets Python)
-*   Docker Desktop
-*   Un fichier `.env` avec vos clés API (`MISTRAL_API_KEY`, etc.)
+Le système est découplé en deux composants principaux :
 
-### Lancement du Serveur (Outils)
-Vous pouvez lancer le serveur directement ou via Docker :
+1.  **Le Serveur MCP (`src/server.py`)** : 
+    *   Développé avec `FastMCP`. 
+    *   **Moteur ML** : Charge dynamiquement un modèle `scikit-learn` (.joblib) depuis **Hugging Face**.
+    *   **Outil** : Expose `predict_price` pour calculer des estimations en temps réel.
+    *   **Conteneurisation** : Déployé sur un cluster **K3S** via Docker.
 
-**Via Docker (recommandé) :**
+2.  **L'Agent IA (`langchain_manager.py`)** : 
+    *   Développé avec `LangChain` et `LangGraph`. 
+    *   **Cerveau** : Utilise `Mistral AI` (mistral-large-latest).
+    *   **Fonctionnement** : Communique avec le serveur distant via **SSE (Server-Sent Events)** pour utiliser les outils de prédiction.
+
+---
+
+## 💻 Développement et Test Local
+
+### 1. Prérequis
+*   [uv](https://github.com/astral-sh/uv) (gestionnaire Python ultra-rapide)
+*   Docker Desktop (pour le serveur)
+*   Clés API dans un fichier `.env` (`MISTRAL_API_KEY`, `HF_USERNAME`, `HF_REPO`, `HF_TOKEN`)
+
+### 2. Lancement du Serveur (Remote ou Local)
+Pour tester l'agent localement avec le serveur déployé sur le Datalab :
 ```bash
-docker build -t immo-mcp-server .
-docker run -p 8000:8000 --env-file .env immo-mcp-server
-```
-Le serveur sera accessible sur `http://localhost:8000/sse`.
+# Établir un tunnel SSH sécurisé
+ssh -L 8080:localhost:8080 p4g2@datalab.myconnectech.fr
 
-### Lancement de l'Agent (Cerveau)
-Dans un autre terminal :
+# (Sur le serveur distant) Lancer le port-forward Kubernetes
+kubectl port-forward -n g2 service/immo-mcp-service 8080:80
+```
+
+### 3. Lancement de l'Agent
 ```bash
 uv run langchain_manager.py
 ```
 
 ---
 
-## 🚀 CI/CD et Docker Registry
-
-Le projet est configuré pour se construire automatiquement via **GitHub Actions**.
-*   **Workflow** : À chaque `push` sur la branche `main` ou `kubernetes`, GitHub construit l'image Docker.
-*   **Registre** : L'image est stockée sur **GitHub Container Registry (GHCR)** à l'adresse `ghcr.io/solenhya/immo-mcp`.
-
----
-
 ## ☸️ Déploiement Kubernetes (K3S)
 
-Le déploiement s'effectue sur le cluster K3S du Datalab.
-
-### 1. Configuration initiale (Secrets)
-Avant de déployer, il faut créer les secrets dans le namespace (`g2` par exemple) :
+L'infrastructure est automatisée via une chaîne **CI/CD (GitHub Actions)** :
+1.  **Build** : L'image est construite et poussée sur **GHCR** (`ghcr.io/solenhya/immo-mcp`).
+2.  **Secrets** : Configuration des accès via `ghcr-auth` et `immo-env`.
+3.  **Service** : Déploiement via `deployment.yaml` avec une stratégie de `rollout` automatique.
 
 ```bash
-# Accès au registre GitHub (nécessite un Personal Access Token)
-kubectl create secret docker-registry ghcr-auth \
-  --docker-server=ghcr.io \
-  --docker-username=VOTRE_PSEUDO \
-  --docker-password=VOTRE_TOKEN \
-  -n g2
-
-# Variables d'environnement (Clés API)
-kubectl create secret generic immo-env --from-env-file=.env -n g2
-```
-
-### 2. Déploiement
-Appliquez le fichier de configuration :
-```bash
-kubectl apply -f deployment.yaml
-```
-
-### 3. Vérification
-```bash
-# Voir l'état du serveur
-kubectl get pods -n g2
-
-# Voir les logs en direct
-kubectl logs -f deployment/immo-mcp-server -n g2
+# Commande pour redéployer après modification du code
+kubectl rollout restart deployment/immo-mcp-server -n g2
 ```
 
 ---
 
-## 🛠️ Structure des Outils
-Les outils sont définis dans `server.py` avec le décorateur `@mcp.tool`. 
-Exemple :
-```python
-@mcp.tool
-def add(a: int, b: int) -> str:
-    """Additionne deux nombres"""
-    return f"{a + b}"
-```
+## 📊 Capacités de l'Outil de Prédiction
+L'outil `predict_price` prend en compte :
+*   `surface_reelle_bati` : Surface du logement.
+*   `surface_terrain` : Surface du terrain (jardin, etc.).
+*   `nombre_pieces_principales` : Nombre de pièces.
+*   `type_local` : Maison ou Appartement.
 
 ---
 
-## 🚀 Améliorations Futures (Roadmap)
-
-Pour faire évoluer ce projet, plusieurs pistes sont envisageables :
-1.  **Multi-modèles** : Intégrer d'autres modèles Hugging Face spécialisés par région ou par type de bien (Appartements vs Maisons).
-2.  **Interface Web** : Ajouter un front-end (React ou Streamlit) pour rendre l'agent accessible à des utilisateurs non techniques.
-3.  **Persistance** : Ajouter une base de données (PostgreSQL) dans le cluster pour mémoriser les estimations passées de chaque utilisateur.
-4.  **Monitoring** : Installer Grafana pour visualiser en temps réel la charge du serveur et le nombre de requêtes traitées.
+## 🚀 Évolutions Possibles (Roadmap)
+*   **Géolocalisation** : Intégrer les coordonnées GPS pour des prix plus précis par quartier.
+*   **Historique DVF** : Ajout d'un outil de recherche automatique sur les dernières ventes réelles.
+*   **Interface Web** : Création d'un tableau de bord avec Streamlit.
 
 ---
 
 ## 📝 Auteur
-Développé dans le cadre du projet immo-mcp - Expertise Immobilière & IA.
+Développé par **Arno / Solenhya** - Expertise Immobilière & IA (Datalab).
