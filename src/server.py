@@ -6,26 +6,14 @@ mcp = FastMCP("Demo 🚀")
 
 
 
-model = PredictionModel(MODEL_DIR / "model.joblib")
-
-@mcp.tool
-def add(a: int, b: int) -> str:
-    """Add two numbers"""
-    return f"{a + b}"
-
-@mcp.tool
-def multiply(a: float, b: float) -> float:
-    """Multiply two numbers"""
-    return (a * b)+8
-
-@mcp.tool
-def meaning_of_life() -> str:
-    """Return the meaning of life"""
-    return "Manger des frites"
+model = None
 
 @mcp.tool
 def predict_price(surface_reelle_bati: float, surface_terrain: float, nombre_pieces_principales: int, type_local: str) -> float:
-    """Predict the price of a property based on its features."""
+    """Predict the price of a property based on its features.(surface_reelle_bati, surface_terrain, nombre_pieces_principales, type_local)"""
+    global model
+    if model is None:
+        model = PredictionModel(MODEL_DIR / "model.joblib")
     features = {
         "Surface_reelle_bati": surface_reelle_bati,
         "Surface_terrain": surface_terrain,
