@@ -60,13 +60,6 @@ def test_process_data_appelle_read_csv(patched_process_io):
 def test_process_data_supprime_lignes_sans_valeur_fonciere(patched_process_io):
     captured = {}
 
-    def fake_to_csv(path, index=False):
-        # `self` est le DataFrame (méthode liée)
-        pass
-
-    # On capture le DataFrame passé à to_csv via un side_effect sur l'instance
-    original_to_csv = pd.DataFrame.to_csv
-
     def capturing_to_csv(self, path, index=False):
         captured["df"] = self.copy()
 
