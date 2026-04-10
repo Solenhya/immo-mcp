@@ -50,9 +50,8 @@ def estimer_prix(surface_m2: float = None, nb_pieces: int = None, code_postal: i
     
     try:
         # Préparation des données pour le modèle (Scikit-Learn attend une liste de listes)
-        # ATTENTION : L'ordre doit être identique à celui de l'entraînement.
-        # Ici j'utilise : [surface, nb_pieces, code_postal]
-        input_data = [[float(surface_m2), int(nb_pieces_calc), int(code_postal)]]
+        # ATTENTION : On ajoute un 4ème paramètre (0 par défaut) car le modèle attend 4 caractéristiques.
+        input_data = [[float(surface_m2), int(nb_pieces_calc), int(code_postal), 0]]
         
         prediction = model.predict(input_data)
         prix_estime = prediction[0]
