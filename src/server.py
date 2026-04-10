@@ -1,22 +1,14 @@
 from fastmcp import FastMCP
 from src.prediction_model import PredictionModel
 import pathlib
-import threading
+import functools
 MODEL_DIR = pathlib.Path(__file__).resolve().parent.parent / "models"
 mcp = FastMCP("Demo 🚀")
 
 
-_model = None
-_model_lock = threading.Lock()
-
-
+@functools.lru_cache(maxsize=1)
 def _get_model() -> PredictionModel:
-    global _model
-    if _model is None:
-        with _model_lock:
-            if _model is None:
-                _model = PredictionModel(MODEL_DIR / "model.joblib")
-    return _model
+    return PredictionModel(MODEL_DIR / "model.joblib")
 
 
 @mcp.tool

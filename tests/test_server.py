@@ -18,9 +18,9 @@ def mock_prediction_model():
     mock_instance.predict.return_value = 320000.0
 
     with patch("src.server.PredictionModel", return_value=mock_instance):
-        server_module._model = None  # réinitialise le singleton
+        server_module._get_model.cache_clear()  # réinitialise le singleton lru_cache
         yield mock_instance
-    server_module._model = None
+    server_module._get_model.cache_clear()
 
 
 # ─────────────────────────────────────────────
