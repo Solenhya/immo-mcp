@@ -1,7 +1,7 @@
 from fastmcp import FastMCP
 from src.prediction_model import PredictionModel
 import pathlib
-MODEL_DIR = pathlib.Path().parent / "models"
+MODEL_DIR = pathlib.Path(__file__).resolve().parent.parent / "models"
 mcp = FastMCP("Demo 🚀")
 
 
