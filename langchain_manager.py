@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Le serveur MCP doit être démarré avant : uv run server.py
-MCP_URL = "http://localhost:8000/sse"
+MCP_URL = "http://localhost:8080/sse"
 
 
 
@@ -104,7 +104,7 @@ class LangchainManager:
     
 async def main():
     langchain_manager = await LangchainManager.create(model_name="mistral-large-latest")
-    prompt = f"""Tu es un assistant d'estimation de prix """
+    prompt = f"""Tu es un expert immobilier. Utilise systématiquement l'outil estimer_prix pour donner des chiffres précis plutôt que de faire des suppositions."""
     initial_messages = [
         SystemMessage(prompt)
     ]

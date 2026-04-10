@@ -1,57 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mcp-immo-server
-  labels:
-    app: mcp-immo-server
+  name: immo-mcp-server
+  namespace: g2
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mcp-immo-server
+      app: immo-mcp
   template:
     metadata:
       labels:
-        app: mcp-immo-server
+        app: immo-mcp
     spec:
       containers:
-        - name: mcp-immo-server
-          image: mcp-immo-server:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8000
-              protocol: TCP
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
-          livenessProbe:
-            httpGet:
-              path: /sse
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /sse
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 10
+      - name: immo-mcp
+        image: ghcr.io/solenhya/immo-mcp:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: immo-env
+      imagePullSecrets:
+      - name: ghcr-auth
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mcp-immo-server
-  labels:
-    app: mcp-immo-server
+  name: immo-mcp-service
+  namespace: g2
 spec:
   selector:
-    app: mcp-immo-server
+    app: immo-mcp
   ports:
     - protocol: TCP
-      port: 8000
+      port: 80
       targetPort: 8000
   type: ClusterIP
