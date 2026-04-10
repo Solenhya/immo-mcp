@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Le serveur MCP doit être démarré avant : uv run server.py
-MCP_URL = "http://localhost:8080/sse"
+MCP_URL = "http://localhost:8080/mcp/"
 
 
 
@@ -37,7 +37,7 @@ class LangchainManager:
             {
                 "dev": {
                     "url": MCP_URL,
-                    "transport": "sse",
+                    "transport": "streamable_http",
                 }
             }
         )
