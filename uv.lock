@@ -889,7 +889,7 @@ wheels = [
 [[package]]
 name = "mcp-immo"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },
     { name = "huggingface-hub" },
@@ -913,7 +913,9 @@ dev = [
 requires-dist = [
     { name = "fastmcp", specifier = ">=3.2.0" },
     { name = "huggingface-hub" },
+    { name = "huggingface-hub", specifier = ">=1.9.0" },
     { name = "joblib" },
+    { name = "joblib", specifier = ">=1.5.3" },
     { name = "langchain", specifier = ">=1.2.15" },
     { name = "langchain-mcp-adapters", specifier = ">=0.2.2" },
     { name = "langchain-mistralai", specifier = ">=1.1.2" },
