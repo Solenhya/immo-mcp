@@ -24,4 +24,4 @@ def predict_price(surface_reelle_bati: float, surface_terrain: float, nombre_pie
     return predicted_price
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=8080)
