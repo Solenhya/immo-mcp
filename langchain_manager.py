@@ -37,7 +37,7 @@ class LangchainManager:
             {
                 "dev": {
                     "url": MCP_URL,
-                    "transport": "sse",
+                    "transport": "streamable_http",
                 }
             }
         )
