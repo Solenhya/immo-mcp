@@ -1,5 +1,6 @@
 import os
 import joblib
+import pandas as pd
 from fastmcp import FastMCP
 from huggingface_hub import hf_hub_download
 from dotenv import load_dotenv
@@ -49,11 +50,11 @@ def estimer_prix(surface_m2: float = None, nb_pieces: int = None, code_postal: i
     nb_pieces_calc = nb_pieces if nb_pieces is not None else 3
     
     try:
-        # Préparation des données pour le modèle (Scikit-Learn attend une liste de listes)
-        # ATTENTION : On ajoute un 4ème paramètre (0 par défaut) car le modèle attend 4 caractéristiques.
-        input_data = [[float(surface_m2), int(nb_pieces_calc), int(code_postal), 0]]
+        # Préparation des données dans un DataFrame (requis par ColumnTransformer)
+        cols = ["surface", "pieces", "cp", "type"] # Noms génériques
+        df_input = pd.DataFrame([[float(surface_m2), int(nb_pieces_calc), int(code_postal), 0]], columns=cols)
         
-        prediction = model.predict(input_data)
+        prediction = model.predict(df_input)
         prix_estime = prediction[0]
         
         return (f"Analyse terminée pour {ville or code_postal} ! "
